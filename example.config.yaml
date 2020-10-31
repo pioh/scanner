@@ -1,0 +1,20 @@
+
+ports:
+  - 58319
+  - 22
+
+users:
+  - myname
+  - root
+
+key: /home/myname/.ssh/id_rsa
+
+nmapFrom:
+  - root@example.external.not.trusted.com:32322
+
+hosts:
+  - exampl1.com
+  - exampl2.com
+  - exampl3.com
+  - exampl4.com
+

@@ -18,3 +18,5 @@ hosts:
   - exampl3.com
   - exampl4.com
 
+netstatCMD: sudo /bin/netstat
+output: /home/myname/portscan/

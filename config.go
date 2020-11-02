@@ -17,6 +17,9 @@ type config struct {
 
 	NmapFrom []string `yaml:"nmapFrom"`
 
+	NetstatCMD string `yaml:"netstatCMD"`
+	Output     string
+
 	signer ssh.Signer
 }
 

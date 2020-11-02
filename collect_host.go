@@ -56,7 +56,7 @@ func (p *CollectedPort) parseNetstatLine(line string) (err error) {
 	if groups == nil {
 		return fmt.Errorf("%w: %v", errFailedParseNetstatLine, line)
 	}
-	p.Protocol = groups[1]
+	p.Protocol = groups[1][0:3]
 
 	if p.RecvQ, err = strconv.Atoi(groups[2]); err != nil {
 		return fmt.Errorf("%w: %v: %+v: %v", errFailedParseNetstatLine, line, err, groups[2])
@@ -105,21 +105,12 @@ func collectIP(cli *ssh.Client, host *CollectedHost) error {
 		return err
 	}
 	defer s.Close()
-	ip4, err := s.CombinedOutput(RE_IPVX + `ip a | grep -Eo "$RE_IPV4"`)
+	ip46, err := s.CombinedOutput(RE_IP + `ip  a | grep -oEi "inet6? [0-9a-z.:]+" | grep -Eo "$RE_IP"`)
 	if err != nil {
-		return fmt.Errorf("failed collect ipv4 %v: %w:\n%v", host.Host, err, string(ip4))
+		return fmt.Errorf("failed collect ip %v: %w:\n%v", host.Host, err, string(ip46))
 	}
 
-	s.Close()
-	s, err = cli.NewSession()
-	if err != nil {
-		return err
-	}
-	ip6, err := s.CombinedOutput(RE_IPVX + `ip a | grep -Eo "$RE_IPV6"`)
-	if err != nil && len(ip6) > 0 {
-		return fmt.Errorf("failed collect ipv6 %v: %w:\n%v", host.Host, err, string(ip6))
-	}
-	allIPs := strings.Split(string(ip4)+"\n"+string(ip6), "\n")
+	allIPs := strings.Split(string(ip46), "\n")
 	allIPs = append(allIPs, strings.Split(cli.RemoteAddr().String(), ":")[0])
 	uniq := map[string]bool{}
 

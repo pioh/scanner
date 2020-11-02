@@ -51,7 +51,7 @@ func nmap(ctx context.Context, cfg config, proxyAddr string, cli *ssh.Client, ta
 		CollectedHost
 		ports []OpenPort
 	}
-	sem := semaphore.NewWeighted(10)
+	sem := semaphore.NewWeighted(20)
 	for _, t := range targets {
 		target := t
 		if err := sem.Acquire(ctx, 1); err != nil {
@@ -141,7 +141,7 @@ func nmapTarget(ctx context.Context, cfg config, cli *ssh.Client, target Collect
 	outScanner := bufio.NewScanner(outReader)
 	for outScanner.Scan() {
 		line := outScanner.Text()
-		if strings.HasPrefix(line,"#") {
+		if strings.HasPrefix(line, "#") {
 			log.Printf(line[1:])
 		}
 		if line == "" || line[0] == '#' || !strings.Contains(line, "Ports:") {
@@ -200,9 +200,7 @@ func cmdUDP6(target CollectedHost) string {
 	var ports []string
 	var ips []string
 	for _, port := range target.Ports {
-		if port.Protocol == "udp6" {
-			ports = append(ports, strconv.Itoa(port.SrcPort))
-		}
+		ports = append(ports, strconv.Itoa(port.SrcPort))
 	}
 	for _, ip := range target.IP {
 		if ip.To4() == nil {
@@ -224,9 +222,7 @@ func cmdUDP4(target CollectedHost) string {
 	var ports []string
 	var ips []string
 	for _, port := range target.Ports {
-		if port.Protocol == "udp" {
-			ports = append(ports, strconv.Itoa(port.SrcPort))
-		}
+		ports = append(ports, strconv.Itoa(port.SrcPort))
 	}
 	for _, ip := range target.IP {
 		if ip.To4() != nil {
@@ -248,9 +244,7 @@ func cmdTCP4(target CollectedHost) string {
 	var ports []string
 	var ips []string
 	for _, port := range target.Ports {
-		if port.Protocol == "tcp" {
-			ports = append(ports, strconv.Itoa(port.SrcPort))
-		}
+		ports = append(ports, strconv.Itoa(port.SrcPort))
 	}
 	for _, ip := range target.IP {
 		if ip.To4() != nil {
@@ -272,9 +266,7 @@ func cmdTCP6(target CollectedHost) string {
 	var ports []string
 	var ips []string
 	for _, port := range target.Ports {
-		if port.Protocol == "tcp6" {
-			ports = append(ports, strconv.Itoa(port.SrcPort))
-		}
+		ports = append(ports, strconv.Itoa(port.SrcPort))
 	}
 	for _, ip := range target.IP {
 		if ip.To4() == nil {

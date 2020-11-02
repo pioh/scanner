@@ -6,14 +6,17 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
+	"path"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh"
@@ -51,7 +54,7 @@ func nmap(ctx context.Context, cfg config, proxyAddr string, cli *ssh.Client, ta
 		CollectedHost
 		ports []OpenPort
 	}
-	sem := semaphore.NewWeighted(20)
+	sem := semaphore.NewWeighted(30)
 	for _, t := range targets {
 		target := t
 		if err := sem.Acquire(ctx, 1); err != nil {
@@ -79,10 +82,22 @@ func nmap(ctx context.Context, cfg config, proxyAddr string, cli *ssh.Client, ta
 	logSync.Lock()
 	defer logSync.Unlock()
 
+	outDir := ""
+	if cfg.Output != "" {
+		outDir = cfg.Output
+		if cfg.OutputByTime {
+			path.Join(outDir, time.Now().Format("2006-01-02T15:04"))
+		}
+		if err := os.MkdirAll(outDir, os.ModePerm); err != nil {
+			return fmt.Errorf("failed create output directory '%v': %w", outDir, err)
+		}
+	}
+
 	for _, t := range openTargets {
 		fmt.Printf("\n%v from %v:\n", t.Host, proxyAddr)
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"Port", "Proto", "IP"})
+		var output []string
 		for _, o := range t.ports {
 			for _, t := range t.Ports {
 				if t.Protocol == o.Protocol && t.SrcPort == o.Port {
@@ -91,12 +106,23 @@ func nmap(ctx context.Context, cfg config, proxyAddr string, cli *ssh.Client, ta
 					}
 				}
 			}
-			table.Append(append([]string{
+			cols := append([]string{
 				strconv.Itoa(o.Port), o.Protocol, o.IP.String(),
-			}, o.Extra...))
+			}, o.Extra...)
+
+			table.Append(cols)
+			if outDir != "" {
+				output = append(output, strings.Join(cols, ","))
+			}
 			// log.Printf("%v/%v/%v/%v", o.Port, o.Protocol, o.IP, strings.Join(o.Extra, "/"))
 		}
 		table.Render()
+		if outDir != "" {
+			fname := path.Join(outDir, fmt.Sprintf("%v.csv", t.Host))
+			if err := ioutil.WriteFile(fname, []byte(strings.Join(output, "\n")), 0640); err != nil {
+				return fmt.Errorf("failed write result to %v: %w", fname, err)
+			}
+		}
 	}
 
 	return err

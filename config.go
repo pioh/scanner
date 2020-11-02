@@ -18,7 +18,9 @@ type config struct {
 	NmapFrom []string `yaml:"nmapFrom"`
 
 	NetstatCMD string `yaml:"netstatCMD"`
-	Output     string
+
+	Output       string
+	OutputByTime bool `yaml:"outputByTime"`
 
 	signer ssh.Signer
 }

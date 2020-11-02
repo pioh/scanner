@@ -43,7 +43,7 @@ func sshEachHost(ctx context.Context, cfg config, job func(cli *ssh.Client, host
 }
 func sshEachAddr(ctx context.Context, cfg config, addr []string, job func(cli *ssh.Client, addr string) error) error {
 	g := ErrGroup{}
-	sem := semaphore.NewWeighted(10)
+	sem := semaphore.NewWeighted(30)
 	for _, h := range addr {
 		host := h
 		if err := sem.Acquire(ctx, 1); err != nil {

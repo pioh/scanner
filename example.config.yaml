@@ -20,3 +20,4 @@ hosts:
 
 netstatCMD: sudo /bin/netstat
 output: /home/myname/portscan/
+outputByTime: false

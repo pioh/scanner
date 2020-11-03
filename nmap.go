@@ -112,7 +112,7 @@ func nmap(ctx context.Context, cfg config, proxyAddr string, cli *ssh.Client, ta
 
 			table.Append(cols)
 			if outDir != "" {
-				output = append(output, fmt.Sprintf("%v,%v,%v\n", proxyAddr, t.Host, strings.Join(cols, ","))
+				output = append(output, fmt.Sprintf("%v,%v,%v\n", proxyAddr, t.Host, strings.Join(cols, ",")))
 			}
 			// log.Printf("%v/%v/%v/%v", o.Port, o.Protocol, o.IP, strings.Join(o.Extra, "/"))
 		}

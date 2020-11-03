@@ -112,14 +112,14 @@ func nmap(ctx context.Context, cfg config, proxyAddr string, cli *ssh.Client, ta
 
 			table.Append(cols)
 			if outDir != "" {
-				output = append(output, strings.Join(cols, ","))
+				output = append(output, fmt.Sprintf("%v,%v,%v\n", proxyAddr, t.Host, strings.Join(cols, ","))
 			}
 			// log.Printf("%v/%v/%v/%v", o.Port, o.Protocol, o.IP, strings.Join(o.Extra, "/"))
 		}
 		table.Render()
 		if outDir != "" {
 			fname := path.Join(outDir, fmt.Sprintf("%v.csv", t.Host))
-			if err := ioutil.WriteFile(fname, []byte(strings.Join(output, "\n")), 0640); err != nil {
+			if err := ioutil.WriteFile(fname, []byte(strings.Join(output, "")), 0640); err != nil {
 				return fmt.Errorf("failed write result to %v: %w", fname, err)
 			}
 		}

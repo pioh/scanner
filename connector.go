@@ -73,11 +73,11 @@ func connectHost(ctx context.Context, cfg config, host string) (client *ssh.Clie
 				return
 			}
 			if ctx.Err() != nil {
-				return nil, ctx.Err()
+				return nil, fmt.Errorf("failed connect host %v: %w", host, ctx.Err())
 			}
 		}
 	}
-	return nil, err
+	return nil, fmt.Errorf("failed connect host %v: %w", host, err)
 }
 
 func connect(ctx context.Context, signer ssh.Signer, addr string) (*ssh.Client, error) {

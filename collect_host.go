@@ -141,10 +141,10 @@ func collectHostsBySSH(ctx context.Context, cfg config) ([]CollectedHost, error)
 			Host: host,
 		}
 		if err := collectPorts(cli, &collectedHost); err != nil {
-			return err
+			return fmt.Errorf("failed collectPorts for host %v: %w", host, err)
 		}
 		if err := collectIP(cli, &collectedHost); err != nil {
-			return err
+			return fmt.Errorf("failed collectIP for host %v: %w", host, err)
 		}
 		m.Lock()
 		defer m.Unlock()

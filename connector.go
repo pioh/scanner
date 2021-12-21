@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net"
 	"net/url"
 	"time"
 
@@ -95,7 +94,7 @@ func connect(ctx context.Context, signer ssh.Signer, addr string) (*ssh.Client, 
 		},
 	}
 
-	client, err := Dial(ctx, "tcp", u.Host, config)
+	client, err := ssh.Dial("tcp", u.Host, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed connect to %v: %+v", addr, err)
 	}
@@ -108,21 +107,22 @@ func connect(ctx context.Context, signer ssh.Signer, addr string) (*ssh.Client, 
 
 	return client, nil
 }
-func Dial(ctx context.Context, network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
-	d := net.Dialer{Timeout: config.Timeout}
 
-	// conn, err := net.DialTimeout(network, addr, config.Timeout)
-	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
-	defer cancel()
-
-	conn, err := d.DialContext(ctx, network, addr)
-
-	if err != nil {
-		return nil, err
-	}
-	c, chans, reqs, err := ssh.NewClientConn(conn, addr, config)
-	if err != nil {
-		return nil, err
-	}
-	return ssh.NewClient(c, chans, reqs), nil
-}
+// func Dial(ctx context.Context, network, addr string, config *ssh.ClientConfig) (*ssh.Client, error) {
+// 	d := net.Dialer{Timeout: config.Timeout}
+//
+// 	// conn, err := net.DialTimeout(network, addr, config.Timeout)
+// 	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
+// 	defer cancel()
+//
+// 	conn, err := d.DialContext(ctx, network, addr)
+//
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	c, chans, reqs, err := ssh.NewClientConn(conn, addr, config)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return ssh.NewClient(c, chans, reqs), nil
+// }

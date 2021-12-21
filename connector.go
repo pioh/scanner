@@ -81,6 +81,9 @@ func connectHost(ctx context.Context, cfg config, host string) (client *ssh.Clie
 }
 
 func connect(ctx context.Context, signer ssh.Signer, addr string) (*ssh.Client, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
 	u, err := url.Parse("tcp://" + addr)
 	if err != nil {
 		return nil, fmt.Errorf("failed parse ssh addr %v: %w", addr, err)

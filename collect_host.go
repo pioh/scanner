@@ -40,9 +40,10 @@ func (c *CollectedHost) parseNetstat(output string) (err error) {
 		}
 		port := CollectedPort{}
 		if err := port.parseNetstatLine(line); err != nil {
-			return fmt.Errorf("failed parse %v line: %w", n, err)
+			log.Printf("failed parse %v line: %+v", n, err)
+		} else {
+			c.Ports = append(c.Ports, port)
 		}
-		c.Ports = append(c.Ports, port)
 	}
 	return nil
 }

@@ -112,7 +112,7 @@ func Dial(ctx context.Context, network, addr string, config *ssh.ClientConfig) (
 	d := net.Dialer{Timeout: config.Timeout}
 
 	// conn, err := net.DialTimeout(network, addr, config.Timeout)
-	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
 	defer cancel()
 
 	conn, err := d.DialContext(ctx, network, addr)
